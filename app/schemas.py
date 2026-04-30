@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, EmailStr
 
-from app.constants import email_length, title_length, username_length
+from app.constants import email_length, image_file_length, title_length, username_length
 
 
 class UserBase(BaseModel):
@@ -11,6 +11,14 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     pass
+
+
+class UserUpdate(BaseModel):
+    username: str | None = Field(default=None, min_length=1, max_length=username_length)
+    email: EmailStr | None = Field(default=None, max_length=email_length)
+    image_file: str | None = Field(
+        default=None, min_length=1, max_length=image_file_length
+    )
 
 
 class UserResponse(UserBase):
@@ -30,6 +38,11 @@ class PostBase(BaseModel):
 
 class PostCreate(PostBase):
     user_id: int
+
+
+class PostUpdate(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=title_length)
+    content: str | None = Field(default=None, min_length=1)
 
 
 class PostResponse(PostBase):
