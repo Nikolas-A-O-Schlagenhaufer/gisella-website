@@ -1,9 +1,12 @@
+from datetime import UTC, datetime
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from .schemas import PostCreate, PostResponse
 
 app = FastAPI()
 
@@ -53,12 +56,26 @@ def post(request: Request, post_id: int):
     )
 
 
-@app.get("/api/post")
+@app.get("/api/post", response_model=list[PostResponse])
 def get_posts():
     return posts
 
 
-@app.get("/api/post/{post_id}")
+@app.post("/api/post", response_model=PostResponse, status_code=status.HTTP_201_CREATED)
+def create_post(post: PostCreate):
+    new_id = int(posts[-1].get("id", 0)) + 1 if posts else 1
+    new_post = {
+        "id": new_id,
+        "author": post.author,
+        "title": post.title,
+        "content": post.content,
+        "date_posted": datetime.now(UTC).date().strftime("%d/%m/%Y"),
+    }
+    posts.append(new_post)
+    return new_post
+
+
+@app.get("/api/post/{post_id}", response_model=PostResponse)
 def get_post(post_id: int):
     for post in posts:
         if post.get("id") == post_id:
