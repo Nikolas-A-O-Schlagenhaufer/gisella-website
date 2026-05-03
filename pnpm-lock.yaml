@@ -7,13 +7,16 @@ settings:
 importers:
 
   .:
-    dependencies:
+    devDependencies:
       '@tailwindcss/cli':
         specifier: ^4.2.4
         version: 4.2.4
       tailwindcss:
         specifier: ^4.2.4
         version: 4.2.4
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
 
 packages:
 
@@ -339,6 +342,11 @@ packages:
     resolution: {integrity: sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==}
     engines: {node: '>=6'}
 
+  typescript@6.0.3:
+    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
 snapshots:
 
   '@jridgewell/gen-mapping@0.3.13':
@@ -574,3 +582,5 @@ snapshots:
   tailwindcss@4.2.4: {}
 
   tapable@2.3.3: {}
+
+  typescript@6.0.3: {}

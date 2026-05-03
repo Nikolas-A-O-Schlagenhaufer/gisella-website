@@ -1,0 +1,30 @@
+{% macro modal(id, title) %}
+<dialog
+  id="{{ id }}"
+  class="m-auto backdrop:bg-black/50 p-0 rounded-lg shadow-xl border-0"
+  onclick="if (event.target === this) this.close();"
+>
+  <div class="w-full max-w-md bg-white p-4">
+    <div class="flex justify-between items-center border-b pb-3 mb-4 gap-4">
+      <h3 class="text-xl font-semibold text-gray-900">{{ title }}</h3>
+      <button
+        onclick="document.getElementById('{{ id }}').close()"
+        class="text-gray-400 hover:text-gray-600"
+      >
+        &times;
+      </button>
+    </div>
+
+    <div class="modal-content">{{ caller() }}</div>
+
+    <div class="mt-6 flex justify-end gap-2">
+      <button
+        onclick="document.getElementById('{{ id }}').close()"
+        class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+      >
+        Fechar
+      </button>
+    </div>
+  </div>
+</dialog>
+{% endmacro %}

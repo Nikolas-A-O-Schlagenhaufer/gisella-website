@@ -1,5 +1,6 @@
+{% import "components/modal.html" as modal with context %}
 <!doctype html>
-<html lang="pt-bt">
+<html lang="pt-br" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,11 +19,55 @@
       rel="stylesheet"
       href="{{ url_for('static', path='/css/output.css') }}"
     />
+    <script
+      type="module"
+      src="{{ url_for('static', path='js/layout.js') }}"
+    ></script>
+    {% block head %} {% endblock head %}
   </head>
-  <body>
-    <nav>
+  <body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50">
+    <nav class="flex justify-between items-center p-2">
       <a href="{{ url_for('home') }}">Website Gisella</a>
+      <div id="nav_rigth" class="flex justify-center items-center gap-1">
+        <button
+          id="new_post_button"
+          type="button"
+          class="px-2 py-1 rounded-full shadow bg-cyan-300 text-slate-900 hover:cursor-pointer hover:bg-cyan-400"
+        >
+          Nova Postagem
+        </button>
+        <button
+          id="dark_mode_toggle_button"
+          type="button"
+          class="rounded-full p-1 hover:cursor-pointer hover:bg-slate-300/50 dark:hover:bg-slate-700/50 focus-visible:bg-slate-300/50 dark:focus-visible:bg-slate-700/50"
+        ></button>
+      </div>
     </nav>
-    {% block content %} {% endblock content %}
+    {% block content %} {% endblock content %} {% call
+    modal.modal(id="new_post_modal", title="Nova Postagem") %}
+    <form id="new_post_form">
+      <div class="flex flex-col">
+        <label for="title_input">Título</label>
+        <input
+          id="title_input"
+          type="text"
+          name="title"
+          class="border rounded-md px-2 py-1"
+          autocomplete="off"
+          maxlength="255"
+          required
+        />
+      </div>
+      <div class="flex flex-col">
+        <label for="content_input">Conteúdo</label>
+        <textarea
+          id="content_input"
+          name="content"
+          class="resize-none border rounded-md px-2 py-1"
+          required
+        ></textarea>
+      </div>
+    </form>
+    {% endcall %} {% block modals %} {% endblock modals %}
   </body>
 </html>

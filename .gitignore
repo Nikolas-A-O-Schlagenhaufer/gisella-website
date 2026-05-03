@@ -314,6 +314,7 @@ pyrightconfig.json
 
 # Ignore tailwindcss built file
 app/static/css/output.css
-
 # SQLite test db file
 blog.db
+# Ignore javascript built files
+app/static/js/*

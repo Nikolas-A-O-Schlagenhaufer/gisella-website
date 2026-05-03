@@ -1,5 +1,8 @@
-{% extends "layout.html" %} {% block content %}
-<article>
+{% import "components/modal.html" as modal with context %} {% extends
+"layout.html" %} {% block head %}
+<script type="module" src="{{ url_for('static', path='js/post.js') }}"></script>
+{% endblock head %} {% block content %}
+<article data-post-id="{{ post.id }}">
   <div>
     <a href="{{ url_for('user_post', user_id=post.author.id) }}"
       >{{ post.author.username }}</a
@@ -8,6 +11,26 @@
     <p>{{ post.content }}</p>
     <small>{{ post.date_posted.date() }}</small>
   </div>
-  <div></div>
+  {% if post.author.id == 1 %}
+  <div id="action_buttons_container" class="flex justify-between gap-2 p-2">
+    <button
+      id="delete_post_button"
+      type="button"
+      class="px-2 py-1 rounded-lg shadow-sm text-slate-50 bg-rose-500 hover:bg-rose-600 hover:cursor-pointer"
+    >
+      Remover
+    </button>
+  </div>
+  {% endif %}
 </article>
-{% endblock content %}
+{% endblock content %} {% block modals %} {% call
+modal.modal("delete_post_modal", "Remover Postagem") %}
+<p>Tem certeza que deseja remover a postagem?</p>
+<button
+  id="delete_post_confirm_button"
+  type="button"
+  class="px-2 py-1 rounded-lg shadow-sm text-slate-950 bg-green-500 hover:bg-green-600 hover:cursor-pointer"
+>
+  Confirmar
+</button>
+{% endcall %} {% endblock modals %}

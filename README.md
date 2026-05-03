@@ -24,7 +24,34 @@ pnpm install
 ```
 
 4. Ter um terminal rodando o script `dev:css` para garantir que o css a partir do tailwindcss seja construído corretamente.
-5. Iniciar o app:
+
+- npm:
+
+```bash
+npm run dev:css
+```
+
+- pnpm:
+
+```bash
+pnpm dev:css
+```
+
+5. Ter outro terminal rodando o script `dev:ts` para garantir que o javascript seja compilado corretamente.
+
+- npm:
+
+```bash
+npm run dev:ts
+```
+
+- pnpm:
+
+```bash
+pnpm dev:ts
+```
+
+6. Iniciar o app:
 
 ```bash
 uv run fastapi dev app
