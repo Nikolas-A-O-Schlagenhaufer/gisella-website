@@ -29,13 +29,28 @@
     <nav class="flex justify-between items-center p-2">
       <a href="{{ url_for('home') }}">Website Gisella</a>
       <div id="nav_rigth" class="flex justify-center items-center gap-1">
-        <button
-          id="new_post_button"
-          type="button"
-          class="px-2 py-1 rounded-full shadow bg-cyan-300 text-slate-900 hover:cursor-pointer hover:bg-cyan-400"
+        <div
+          id="logged_in_div"
+          class="hidden justify-center items-center gap-1"
         >
-          Nova Postagem
-        </button>
+          <button
+            id="new_post_button"
+            type="button"
+            class="px-2 py-1 rounded-full shadow bg-cyan-300 text-slate-900 hover:cursor-pointer hover:bg-cyan-400"
+          >
+            Nova Postagem
+          </button>
+          <span id="current_user_email" class="py-1 px-2"></span>
+          <a
+            href="{{ url_for('logout_user') }}"
+            class="px-2 py-1 hover:cursor-pointer"
+            >Sair</a
+          >
+        </div>
+        <div id="logged_out_div" class="flex justify-center items-center gap-1">
+          <a href="{{ url_for('signin') }}">Cadastrar</a>
+          <a href="{{ url_for('login') }}">Entrar</a>
+        </div>
         <button
           id="dark_mode_toggle_button"
           type="button"

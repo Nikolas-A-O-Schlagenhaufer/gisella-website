@@ -74,3 +74,13 @@ async def user_post(request: Request, user_id: int, db: DataBase):
         "user_post.html",
         {"posts": user_posts, "user": user, "title": f"Postagens de {user.username}"},
     )
+
+
+@router.get("/login", include_in_schema=False)
+async def login(request: Request):
+    return templates.TemplateResponse(request, "login.html", {"title": "Login"})
+
+
+@router.get("/signin", include_in_schema=False)
+async def signin(request: Request):
+    return templates.TemplateResponse(request, "signin.html", {"title": "Cadastro"})

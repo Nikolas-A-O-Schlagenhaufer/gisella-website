@@ -1,3 +1,5 @@
+import { get_current_user } from "./auth.js";
+
 const new_post_button =
   document.querySelector<HTMLButtonElement>("#new_post_button");
 const new_post_modal =
@@ -5,6 +7,12 @@ const new_post_modal =
 const new_post_form = document.querySelector<HTMLFormElement>("#new_post_form");
 const dark_mode_toggle_button = document.querySelector<HTMLButtonElement>(
   "#dark_mode_toggle_button",
+);
+const logged_in_div = document.querySelector<HTMLDivElement>("#logged_in_div");
+const logged_out_div =
+  document.querySelector<HTMLDivElement>("#logged_out_div");
+const current_user_email = document.querySelector<HTMLSpanElement>(
+  "#current_user_email",
 );
 
 const dark_mode_svg = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#f8fafc"><path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z"/></svg>`;
@@ -17,6 +25,7 @@ if (user_selection != null) {
 }
 document.documentElement.classList.toggle("dark", dark_mode);
 update_dark_mode_toggle_button_icon();
+await update_nav_based_on_current_user();
 
 new_post_button?.addEventListener("click", open_new_post_modal);
 new_post_form?.addEventListener("submit", (e) =>
@@ -78,5 +87,24 @@ function update_dark_mode_toggle_button_icon(): void {
     dark_mode_toggle_button.innerHTML = dark_mode_svg;
   } else {
     dark_mode_toggle_button.innerHTML = light_mode_svg;
+  }
+}
+
+async function update_nav_based_on_current_user(): Promise<void> {
+  if (!logged_in_div || !logged_out_div || !current_user_email) {
+    return;
+  }
+  const user = await get_current_user(false);
+  if (user) {
+    logged_in_div.classList.remove("hidden");
+    logged_in_div.classList.add("flex");
+    logged_out_div.classList.add("hidden");
+    logged_out_div.classList.remove("flex");
+    current_user_email.innerText = user.email;
+  } else {
+    logged_in_div.classList.add("hidden");
+    logged_in_div.classList.remove("flex");
+    logged_out_div.classList.remove("hidden");
+    logged_out_div.classList.add("flex");
   }
 }

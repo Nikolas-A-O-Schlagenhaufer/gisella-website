@@ -5,7 +5,13 @@ from datetime import datetime, UTC
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.constants import email_length, image_file_length, title_length, username_length
+from app.constants import (
+    email_length,
+    image_file_length,
+    password_length,
+    title_length,
+    username_length,
+)
 from app.db import Base
 
 
@@ -21,6 +27,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(
         String(email_length), unique=True, nullable=False
     )
+    password: Mapped[str] = mapped_column(String(password_length), nullable=False)
     image_file: Mapped[str | None] = mapped_column(
         String(image_file_length), nullable=True, default=None
     )
