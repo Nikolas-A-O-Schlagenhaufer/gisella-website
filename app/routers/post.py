@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
+from app.auth import CurrentUser
 import app.models as models
 from app.db import DataBase
 from app.schemas import PostCreate, PostResponse, PostUpdate
@@ -10,18 +11,13 @@ router = APIRouter()
 
 
 @router.post("", response_model=PostResponse, status_code=status.HTTP_201_CREATED)
-async def create_post(post: PostCreate, db: DataBase):
+async def create_post(post: PostCreate, db: DataBase, current_user: CurrentUser):
     """
     Criar uma nova postagem.
     """
-    user_query = select(models.User).where(models.User.id == post.user_id).limit(1)
-    user_result = await db.execute(user_query)
-    user = user_result.scalar()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado"
-        )
-    new_post = models.Post(title=post.title, content=post.content, user_id=post.user_id)
+    new_post = models.Post(
+        title=post.title, content=post.content, user_id=current_user.id
+    )
     db.add(new_post)
     await db.commit()
     await db.refresh(new_post, attribute_names=["author"])
@@ -65,7 +61,9 @@ async def get_post(post_id: int, db: DataBase):
 
 
 @router.patch("/{post_id}", response_model=PostResponse)
-async def update_post(post_id: int, post_data: PostUpdate, db: DataBase):
+async def update_post(
+    post_id: int, post_data: PostUpdate, db: DataBase, current_user: CurrentUser
+):
     """
     Atualizar campos de uma postagem.
     """
@@ -81,6 +79,11 @@ async def update_post(post_id: int, post_data: PostUpdate, db: DataBase):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Postagem não encontrada."
         )
+    if post.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Não autorizado a atualizar as informações dessa postagem.",
+        )
     update_data = post_data.model_dump(exclude_unset=True)
     for field, value in update_data.items():  # pyright: ignore[reportAny]
         setattr(post, field, value)
@@ -90,7 +93,7 @@ async def update_post(post_id: int, post_data: PostUpdate, db: DataBase):
 
 
 @router.delete("/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_post(post_id: int, db: DataBase):
+async def delete_post(post_id: int, db: DataBase, current_user: CurrentUser):
     """
     Remover uma postagem.
     """
@@ -100,6 +103,11 @@ async def delete_post(post_id: int, db: DataBase):
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Postagem não encontrada."
+        )
+    if post.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Não autorizado a remover essa postagem.",
         )
     await db.delete(post)
     await db.commit()

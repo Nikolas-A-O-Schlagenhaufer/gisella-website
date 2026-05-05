@@ -25,7 +25,7 @@ if (user_selection != null) {
 }
 document.documentElement.classList.toggle("dark", dark_mode);
 update_dark_mode_toggle_button_icon();
-await update_nav_based_on_current_user();
+update_nav_based_on_current_user();
 
 new_post_button?.addEventListener("click", open_new_post_modal);
 new_post_form?.addEventListener("submit", (e) =>
@@ -42,30 +42,34 @@ function open_new_post_modal(): void {
 
 async function handle_new_post_form_submit(e: SubmitEvent): Promise<void> {
   e.preventDefault();
-  if (!new_post_form) {
+  if (!new_post_form || !new_post_modal) {
     return;
   }
   const formData = new FormData(new_post_form);
-  formData.set("user_id", "1");
   const postData = Object.fromEntries(formData.entries());
   try {
     const response = await fetch("/api/post", {
       method: "POST",
       headers: {
+        Accept: "application/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(postData),
+      credentials: "include",
     });
-    if (response.ok) {
-      new_post_form.reset();
-      new_post_modal?.close();
-      window.location.reload();
+    if (response.status === 401) {
+      window.location.href = "/logout";
       return;
-    } else {
+    }
+    if (!response.ok) {
       const error = await response.json();
       window.alert(error);
       return;
     }
+    new_post_form.reset();
+    new_post_modal.close();
+    window.location.reload();
+    return;
   } catch (error) {
     window.alert(error);
     return;

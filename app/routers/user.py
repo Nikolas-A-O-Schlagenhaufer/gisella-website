@@ -7,10 +7,9 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 
 from app.auth import (
+    CurrentUser,
     create_access_token,  # pyright: ignore[reportUnknownVariableType]
     hash_password,
-    oauth2_scheme,
-    verify_access_token,
     verify_password,
 )
 from app.config import settings
@@ -106,35 +105,11 @@ async def login_for_access_token(
 
 
 @router.get("/me", response_model=UserPrivate)
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: DataBase):
+async def get_current_user(current_user: CurrentUser):
     """
     Retorna o usuário logado atualmente.
     """
-    user_id_str = verify_access_token(token)
-    if user_id_str is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token de acesso inválido ou expirado.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    try:
-        user_id = int(user_id_str)
-    except (TypeError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token de acesso inválido ou expirado.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    user_query = select(models.User).where(models.User.id == user_id).limit(1)
-    user_result = await db.execute(user_query)
-    user = user_result.scalar()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Usuário não encontrado.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
+    return current_user
 
 
 @router.get(
@@ -193,10 +168,17 @@ async def get_user_posts(user_id: int, db: DataBase):
 
 
 @router.patch("/{user_id}", response_model=UserPrivate)
-async def update_user(user_id: int, user_data: UserUpdate, db: DataBase):
+async def update_user(
+    user_id: int, user_data: UserUpdate, db: DataBase, current_user: CurrentUser
+):
     """
     Atualizar campos de um usuário.
     """
+    if user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Não autorizado a atualizar as informações desse usuário.",
+        )
     user_query = select(models.User).where(models.User.id == user_id).limit(1)
     user_result = await db.execute(user_query)
     user = user_result.scalar()
@@ -245,10 +227,15 @@ async def update_user(user_id: int, user_data: UserUpdate, db: DataBase):
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: int, db: DataBase):
+async def delete_user(user_id: int, db: DataBase, current_user: CurrentUser):
     """
     Remover um usuário.
     """
+    if user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Não autorizado a remover esse usuário.",
+        )
     user_query = select(models.User).where(models.User.id == user_id).limit(1)
     user_result = await db.execute(user_query)
     user = user_result.scalar()

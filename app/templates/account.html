@@ -1,0 +1,53 @@
+{% extends "layout.html" %} {% block head %}
+<script
+  type="module"
+  src="{{ url_for('static', path='js/account.js') }}"
+></script>
+{% endblock head %} {% block content %}
+<div>
+  <h2>Configurações da Conta</h2>
+  <div>
+    <h5 id="username"></h5>
+    <p id="email"></p>
+  </div>
+  <div>
+    <h4>Atualizar Informações</h4>
+    <form
+      id="update_user_form"
+      class="flex flex-col justify-start items-start gap-2 p-2"
+    >
+      <div class="flex flex-col gap-1">
+        <label for="username_input">Nome de Usuário</label>
+        <input
+          id="username_input"
+          type="text"
+          name="username"
+          class="px-2 py-1"
+          maxlength="255"
+          autocomplete="off"
+          required
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="email_input">Email</label>
+        <input
+          id="email_input"
+          type="email"
+          name="email"
+          class="px-2 py-1"
+          maxlength="255"
+          autocomplete="email"
+          required
+        />
+      </div>
+      <button
+        id="update_user_form_submit_button"
+        type="submit"
+        class="rounded-md px-4 py-2 shadow-sm bg-lime-500 text-slate-900 hover:bg-lime-600 hover:cursor-pointer"
+      >
+        Atualizar
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock content %}

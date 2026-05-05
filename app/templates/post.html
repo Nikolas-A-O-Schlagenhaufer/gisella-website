@@ -2,7 +2,7 @@
 "layout.html" %} {% block head %}
 <script type="module" src="{{ url_for('static', path='js/post.js') }}"></script>
 {% endblock head %} {% block content %}
-<article data-post-id="{{ post.id }}">
+<article data-post-id="{{ post.id }}" data-post-user-id="{{ post.user_id }}">
   <div>
     <a href="{{ url_for('user_post', user_id=post.author.id) }}"
       >{{ post.author.username }}</a
@@ -11,8 +11,7 @@
     <p>{{ post.content }}</p>
     <small>{{ post.date_posted.date() }}</small>
   </div>
-  {% if post.author.id == 1 %}
-  <div id="action_buttons_container" class="flex justify-between gap-2 p-2">
+  <div id="action_buttons_container" class="hidden justify-between gap-2 p-2">
     <button
       id="delete_post_button"
       type="button"
@@ -21,7 +20,6 @@
       Remover
     </button>
   </div>
-  {% endif %}
 </article>
 {% endblock content %} {% block modals %} {% call
 modal.modal("delete_post_modal", "Remover Postagem") %}

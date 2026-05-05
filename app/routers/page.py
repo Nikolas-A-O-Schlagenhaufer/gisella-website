@@ -84,3 +84,8 @@ async def login(request: Request):
 @router.get("/signin", include_in_schema=False)
 async def signin(request: Request):
     return templates.TemplateResponse(request, "signin.html", {"title": "Cadastro"})
+
+
+@router.get("/account", include_in_schema=False)
+async def account(request: Request):
+    return templates.TemplateResponse(request, "account.html", {"title": "Conta"})
