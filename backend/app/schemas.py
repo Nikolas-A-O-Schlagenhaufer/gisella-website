@@ -39,6 +39,7 @@ class UserPrivate(UserPublic):
 class Token(BaseModel):
     access_token: str
     toke_type: str
+    max_age: int
 
 
 class PostBase(BaseModel):

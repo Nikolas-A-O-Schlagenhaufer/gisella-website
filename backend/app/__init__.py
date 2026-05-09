@@ -5,6 +5,7 @@ from fastapi.exception_handlers import (
     http_exception_handler,
     request_validation_exception_handler,
 )
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -25,6 +26,14 @@ app = FastAPI(lifespan=lifespan)
 
 app.mount("/static", StaticFiles(directory="app/static", html=True), name="static")
 app.mount("/media", StaticFiles(directory="app/media", html=True), name="media")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_credentials=True,
+)
 
 app.include_router(page_routes.router, prefix="", tags=["Página"])
 app.include_router(post_routes.router, prefix="/api/post", tags=["Postagem"])

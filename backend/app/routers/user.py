@@ -1,7 +1,6 @@
 from datetime import timedelta
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
@@ -92,16 +91,17 @@ async def login_for_access_token(
     access_token = create_access_token(
         data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
+    max_age: int = settings.access_token_expire_minutes * 60
     response.set_cookie(
         key="access_token",
         value=access_token,
-        max_age=settings.access_token_expire_minutes * 60,
+        max_age=max_age,
         path="/",
         secure=True,
         httponly=True,
         samesite="lax",
     )
-    return Token(access_token=access_token, toke_type="bearer")
+    return Token(access_token=access_token, toke_type="bearer", max_age=max_age)
 
 
 @router.get("/me", response_model=UserPrivate)
@@ -110,23 +110,6 @@ async def get_current_user(current_user: CurrentUser):
     Retorna o usuário logado atualmente.
     """
     return current_user
-
-
-@router.get(
-    "/logout", response_class=RedirectResponse, status_code=status.HTTP_302_FOUND
-)
-async def logout_user():
-    """
-    Deslogar um usuário.
-    """
-    response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
-    response.delete_cookie(
-        key="access_token",
-        secure=True,
-        httponly=True,
-        samesite="lax",
-    )
-    return response
 
 
 @router.get("/{user_id}", response_model=UserPublic)
